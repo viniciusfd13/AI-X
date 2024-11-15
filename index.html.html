@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI ROI Calculator</title>
+    <!-- Load React -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Load Tailwind CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        /* Add custom styles */
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f8fafc;
+        }
+        input {
+            border: 1px solid #e2e8f0;
+            padding: 8px;
+            border-radius: 6px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator-container"></div>
+    <script>
+        // Wait for everything to load
+        window.addEventListener('load', function() {
+            const Calculator = () => {
+                const [data, setData] = React.useState({
+                    employees: 10,
+                    hourlyRate: 50,
+                    hoursPerWeek: 40,
+                    timeSaving: 20,
+                    cost: 10000
+                });
+
+                const calculate = () => {
+                    const annualHours = data.hoursPerWeek * 52;
+                    const hoursSaved = (annualHours * data.timeSaving / 100) * data.employees;
+                    const annualSavings = hoursSaved * data.hourlyRate;
+                    const roi = ((annualSavings - data.cost) / data.cost * 100).toFixed(1);
+                    
+                    return {
+                        hoursSaved: Math.round(hoursSaved),
+                        annualSavings: Math.round(annualSavings),
+                        monthlySavings: Math.round(annualSavings / 12),
+                        roi: roi
+                    };
+                };
+
+                const results = calculate();
+
+                return React.createElement('div', { 
+                    className: 'max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg'
+                },
+                    // Title
+                    React.createElement('h1', { 
+                        className: 'text-2xl font-bold mb-6 text-center text-blue-600'
+                    }, 'AI ROI Calculator'),
+                    
+                    // Main Grid
+                    React.createElement('div', { 
+                        className: 'grid grid-cols-1 md:grid-cols-2 gap-8'
+                    },
+                        // Input Column
+                        React.createElement('div', { className: 'space-y-4' },
+                            React.createElement('h2', { 
+                                className: 'text-xl font-semibold mb-4'
+                            }, 'Input Parameters'),
+                            
+                            // Input Fields
+                            Object.entries({
+                                'Number of Employees': { key: 'employees', type: 'number' },
+                                'Hourly Rate ($)': { key: 'hourlyRate', type: 'number' },
+                                'Hours per Week': { key: 'hoursPerWeek', type: 'number' },
+                                'Expected Time Saving (%)': { key: 'timeSaving', type: 'number' },
+                                'Implementation Cost ($)': { key: 'cost', type: 'number' }
+                            }).map(([label, config]) =>
+                                React.createElement('div', { 
+                                    key: config.key, 
+                                    className: 'form-group'
+                                },
+                                    React.createElement('label', { 
+                                        className: 'block text-sm font-medium mb-2'
+                                    }, label),
+                                    React.createElement('input', {
+                                        type: config.type,
+                                        value: data[config.key],
+                                        onChange: (e) => setData({ 
+                                            ...data, 
+                                            [config.key]: Number(e.target.value) || 0 
+                                        }),
+                                        className: 'w-full p-2 border rounded shadow-sm'
+                                    })
+                                )
+                            )
+                        ),
+                        
+                        // Results Column
+                        React.createElement('div', { 
+                            className: 'bg-blue-50 p-6 rounded-lg'
+                        },
+                            React.createElement('h2', { 
+                                className: 'text-xl font-semibold mb-4'
+                            }, 'Results'),
+                            React.createElement('div', { className: 'space-y-4' },
+                                // Results Display
+                                Object.entries({
+                                    'Annual Hours Saved': results.hoursSaved.toLocaleString() + ' hours',
+                                    'Monthly Savings': '$' + results.monthlySavings.toLocaleString(),
+                                    'Annual Savings': '$' + results.annualSavings.toLocaleString(),
+                                    'Return on Investment': results.roi + '%'
+                                }).map(([label, value]) =>
+                                    React.createElement('div', { 
+                                        key: label, 
+                                        className: 'bg-white p-4 rounded-lg shadow'
+                                    },
+                                        React.createElement('div', { 
+                                            className: 'text-sm text-gray-600'
+                                        }, label),
+                                        React.createElement('div', { 
+                                            className: 'text-2xl font-bold text-blue-600'
+                                        }, value)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
+            };
+
+            // Render the calculator
+            const root = ReactDOM.createRoot(document.getElementById('calculator-container'));
+            root.render(React.createElement(Calculator));
+        });
+    </script>
+</body>
+</html>
